@@ -1,0 +1,21 @@
+<resources>
+    <string name="AloopyAPIURL">http://130.211.177.252:9999</string>
+    <string name="SharedPrefName">com.customer.aloopy.aloopycustomerapp</string>
+    <string name="EXTRA_LoginDisplay_Name">com.customer.aloopy.LoginDisplay_Name</string>
+    <string name="EXTRA_StampDetail_Id">com.customer.aloopy.aloopycustomerapp.CustomerStampId</string>
+    <string name="SHARE_PREF_UserId">UserId</string>
+
+    <string name="app_name">Aloopy Customer App</string>
+    <string name="WelcomeText">"Welcome, "</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Stamp List</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="MerchantLogoAlt">Merchant Logo</string>
+    <string name="StampRewardImageALT">Stamp Reward</string>
+    <string name="StampCountLabel">Stamps</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_signup">Sign Up</string>
+
+
+</resources>
