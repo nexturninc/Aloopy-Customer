@@ -8,12 +8,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 /**
  * Created by imbisibol on 9/8/2015.
@@ -33,10 +37,52 @@ public class SignupActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_signup);
 
+        Button btnSignup = ((Button)findViewById(R.id.btnSignUp));
+        btnSignup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptLogin();
+            }
+        });
+
+    }
+
+    public void attemptLogin() {
+        if (mSignupTask != null) {
+            return;
+        }
+
+        TextView txtPassword = (TextView)findViewById(R.id.txtPassword);
+        TextView txtConfirmPassword = (TextView)findViewById(R.id.txtConfirmPassword);
+
+        if(txtPassword.getText().length() == 0)
+            txtPassword.setText("Password is required!");
+        else {
+            if (txtPassword.getText().toString().equals(txtConfirmPassword.getText().toString())) {
+
+                TextView txtUserName = (TextView) findViewById(R.id.txtUsername);
+                TextView txtEmailAddress = (TextView) findViewById(R.id.txtEmailAddress);
+                TextView txtFirstName = (TextView) findViewById(R.id.txtFirstName);
+                TextView txtLastName = (TextView) findViewById(R.id.txtLastName);
+
+                if(txtUserName.getText().length() == 0)
+                    txtUserName.setError("Username is required!");
+                else if (txtEmailAddress.getText().length() == 0)
+                    txtEmailAddress.setError("Email Address is required!");
+                else {
+                    mSignupTask = new SignupTask(txtEmailAddress.getText().toString(),
+                            txtUserName.getText().toString(), txtPassword.getText().toString(),
+                            txtFirstName.getText().toString(), txtLastName.getText().toString());
+                    mSignupTask.execute((Void) null);
+                }
+            } else {
+                txtConfirmPassword.setError("Password Confirmation does not match!");
+            }
+        }
     }
 
 
-    public class SignupTask extends AsyncTask<Void, Void, Boolean> {
+        public class SignupTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mUsername;
@@ -65,7 +111,10 @@ public class SignupActivity extends Activity {
 
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("password", mPassword);
-                jsonParam.put("username", mEmail);
+                jsonParam.put("username", mUsername);
+                jsonParam.put("emailAddress", mEmail);
+                jsonParam.put("firstName", mFirstname);
+                jsonParam.put("lastName", mLastname);
 
 
                 Common comm = new Common();
@@ -77,6 +126,7 @@ public class SignupActivity extends Activity {
 
                     String strSuccess = jsonResponse.getString("success");
 
+                    /*
                     if (strSuccess == "true") {
 
                         JSONArray customerInfo = jsonResponse.getJSONArray("customerInfo");
@@ -129,6 +179,7 @@ public class SignupActivity extends Activity {
 
                         loginSuccess = true;
                     }
+                    */
                 }
 
             } catch (Exception ex) {
