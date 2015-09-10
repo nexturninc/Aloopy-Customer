@@ -16,6 +16,7 @@
     <string name="StampCountLabel">Stamps</string>
     <string name="action_settings">Settings</string>
     <string name="action_signup">Sign Up</string>
+    <string name="lbl_SignUp">Sign Up</string>
 
 
 </resources>
