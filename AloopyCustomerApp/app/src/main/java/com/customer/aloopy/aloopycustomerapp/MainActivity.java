@@ -54,7 +54,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -68,6 +68,10 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        else if (id == R.id.action_profile){
+            Intent intent = new Intent(getBaseContext(), CustomerProfile.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
@@ -92,15 +96,12 @@ public class MainActivity extends ActionBarActivity {
             switch(position)
             {
                 case 0:
-                    CustomerProfile customerProfile = CustomerProfile.newInstance();
-
-                    return customerProfile;
+                    StampList stampList = StampList.newInstance();
+                    return stampList;
                 case 1:
                     return TestFragment.newInstance(1);
                 case 2:
-                    StampList stampList = StampList.newInstance();
-
-                    return stampList;
+                    return TestFragment.newInstance(2);
                 default:
                     return TestFragment.newInstance(999);
             }
@@ -118,11 +119,11 @@ public class MainActivity extends ActionBarActivity {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return getString(R.string.title_section3).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section2).toUpperCase(l);
                 case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return getString(R.string.title_section1).toUpperCase(l);
             }
             return null;
         }

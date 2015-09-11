@@ -75,6 +75,48 @@ public class Common {
         return jsonObject;
     }
 
+    public JSONObject PutAPI(JSONObject jsonParam, String apiMethod) {
+        String result = "";
+        StringBuilder sb = new StringBuilder();
+        JSONObject jsonObject = null;
+
+        URL url = null;
+        try {
+            url = new URL(APIURL + apiMethod);
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("PUT");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.connect();
+
+            OutputStreamWriter out = new OutputStreamWriter(conn.getOutputStream());
+            out.write(jsonParam.toString());
+            out.close();
+
+            int HttpResult = conn.getResponseCode();
+            if (HttpResult == HttpURLConnection.HTTP_OK) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                        conn.getInputStream(), "utf-8"));
+                String line = null;
+                while ((line = br.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+                br.close();
+
+                jsonObject = new JSONObject(sb.toString());
+
+                System.out.println("" + sb.toString());
+
+            } else {
+                System.out.println(conn.getResponseMessage());
+            }
+        } catch (Exception ex) {
+            Object abc = ex;
+        }
+
+        return jsonObject;
+    }
+
     public JSONObject GetAPI(String apiMethod) {
         String result = "";
         StringBuilder sb = new StringBuilder();

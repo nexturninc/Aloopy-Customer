@@ -15,8 +15,10 @@
     <string name="StampRewardImageALT">Stamp Reward</string>
     <string name="StampCountLabel">Stamps</string>
     <string name="action_settings">Settings</string>
-    <string name="action_signup">Sign Up</string>
-    <string name="lbl_SignUp">Sign Up</string>
+    <string name="action_profile">Profile</string>
+    <string name="action_signup">Register</string>
+    <string name="lbl_SignUp">Register</string>
+    <string name="btnUpdateProfile">Update Profile</string>
 
 
 </resources>
