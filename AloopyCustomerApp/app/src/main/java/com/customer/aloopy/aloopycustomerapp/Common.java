@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -70,9 +71,20 @@ public class Common {
             } else {
                 System.out.println(conn.getResponseMessage());
             }
-        } catch (Exception ex) {
-            Object abc = ex;
         }
+        catch (Exception ex) {
+            try {
+                jsonObject = new JSONObject();
+                jsonObject.put("success", true);
+                jsonObject.put("responseMessage", ex.getMessage());
+            }
+            catch(Exception ex2)
+            {
+
+            }
+        }
+
+
 
         return jsonObject;
     }
@@ -112,8 +124,17 @@ public class Common {
             } else {
                 System.out.println(conn.getResponseMessage());
             }
-        } catch (Exception ex) {
-            Object abc = ex;
+        }
+        catch (Exception ex) {
+            try {
+                jsonObject = new JSONObject();
+                jsonObject.put("success", true);
+                jsonObject.put("responseMessage", ex.getMessage());
+            }
+            catch(Exception ex2)
+            {
+
+            }
         }
 
         return jsonObject;
@@ -150,8 +171,17 @@ public class Common {
             } else {
                 System.out.println(conn.getResponseMessage());
             }
-        } catch (Exception ex) {
-            Object abc = ex;
+        }
+        catch (Exception ex) {
+            try {
+                jsonObject = new JSONObject();
+                jsonObject.put("success", true);
+                jsonObject.put("responseMessage", ex.getMessage());
+            }
+            catch(Exception ex2)
+            {
+
+            }
         }
 
         return jsonObject;

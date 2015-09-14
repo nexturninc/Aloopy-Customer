@@ -4,8 +4,10 @@ package com.customer.aloopy.aloopycustomerapp;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,10 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
+import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
+import com.customer.aloopy.aloopydatabase.CustomerStampSetContract;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -73,6 +79,22 @@ public class MainActivity extends ActionBarActivity {
             Intent intent = new Intent(getBaseContext(), CustomerProfile.class);
             startActivity(intent);
         }
+        else if (id == R.id.action_logout){
+            AloopySQLHelper helper = AloopySQLHelper.getInstance(getBaseContext());
+            SQLiteDatabase db = helper.getWritableDatabase();
+
+            db.delete(CustomerInfoContract.CustomerInformation.TABLE_NAME, null, null);
+            db.delete(CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME, null, null);
+
+            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.clear();
+            editor.commit();
+
+            Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+            startActivity(intent);
+        }
+
 
         return super.onOptionsItemSelected(item);
     }

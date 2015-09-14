@@ -6,12 +6,14 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -28,6 +30,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
@@ -68,10 +71,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
+                if (Common.GetInternetConnectivity((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))) {
+                    if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                        attemptLogin();
+                        return true;
+                    }
                 }
+                else {
+                    mPasswordView.setError("Internet connection is required to log in.");
+                    mPasswordView.requestFocus();
+                }
+
                 return false;
             }
         });
@@ -80,7 +90,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                if (Common.GetInternetConnectivity((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))) {
+                    attemptLogin();
+                }
+                else {
+                    mEmailView.setError("Internet connection is required to log in.");
+                    mEmailView.requestFocus();
+                }
             }
         });
 
@@ -97,6 +113,19 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mProgressView = findViewById(R.id.login_progress);
 
         Common.getImageLoader(this);
+
+        //GO RIGHT IN, BECAUSE YOU ALREADY LOGGED IN BEFORE
+        SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(this.getBaseContext());
+        String UserID = mSettings.getString(this.getString(R.string.SHARE_PREF_UserId), null);
+        String UserDisplay = mSettings.getString(this.getString(R.string.SHARE_PREF_UserName), null);
+        if(UserID != null && !UserID.isEmpty())
+        {
+            Toast toast = Toast.makeText(getBaseContext(), "Logged in as " + UserDisplay, Toast.LENGTH_SHORT);
+            toast.show();
+
+            Intent intent = new Intent(getBaseContext(), MainActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void populateAutoComplete() {
@@ -297,19 +326,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                         if(customerInfo != null && customerInfo.length() > 0) {
                             userId = customerInfo.getJSONObject(0).getString("id");
-                            //SAVE TO SHARED PREFERENCES
-                            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                            SharedPreferences.Editor editor = mSettings.edit();
-                            editor.putString(getString(R.string.SHARE_PREF_UserId), userId);
-                            editor.commit();
-
                             userDisplay = customerInfo.getJSONObject(0).getString("firstName")  +
                                     " " +
                                     customerInfo.getJSONObject(0).getString("lastName") +
                                     " (" +
                                     customerInfo.getJSONObject(0).getString("code") +
                                     ")"
-                                    ;
+                            ;
+
+                            //SAVE TO SHARED PREFERENCES
+                            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                            SharedPreferences.Editor editor = mSettings.edit();
+                            editor.putString(getString(R.string.SHARE_PREF_UserId), userId);
+                            editor.putString(getString(R.string.SHARE_PREF_UserName), userDisplay);
+                            editor.commit();
+
 
                             // Gets the data repository in write mode
                             AloopySQLHelper helper = AloopySQLHelper.getInstance(getBaseContext());
@@ -352,7 +383,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
             if(loginSuccess) {
                 Intent intent = new Intent(getBaseContext(), MainActivity.class);
-                intent.putExtra(getString(R.string.EXTRA_LoginDisplay_Name), userDisplay);
                 startActivity(intent);
             }
 
@@ -368,6 +398,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
             if (success) {
                 finish();
+            }
+            else if (!Common.GetInternetConnectivity((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))){
+                mPasswordView.setError("Internet connection is required to log in.");
+                mPasswordView.requestFocus();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();

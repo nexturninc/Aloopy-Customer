@@ -238,19 +238,20 @@ public class CustomerProfile extends ActionBarActivity {
 
                         if(customerInfo != null && customerInfo.length() > 0) {
                             userId = customerInfo.getJSONObject(0).getString("id");
-                            //SAVE TO SHARED PREFERENCES
-                            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                            SharedPreferences.Editor editor = mSettings.edit();
-                            editor.putString(getString(R.string.SHARE_PREF_UserId), userId);
-                            editor.commit();
-
                             userDisplay = customerInfo.getJSONObject(0).getString("firstName")  +
                                     " " +
                                     customerInfo.getJSONObject(0).getString("lastName") +
                                     " (" +
                                     customerInfo.getJSONObject(0).getString("code") +
-                                    ")"
-                            ;
+                                    ")";
+
+                            //SAVE TO SHARED PREFERENCES
+                            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                            SharedPreferences.Editor editor = mSettings.edit();
+                            editor.putString(getString(R.string.SHARE_PREF_UserId), userId);
+                            editor.putString(getString(R.string.SHARE_PREF_UserName), userDisplay);
+                            editor.commit();
+
 
                             // Gets the data repository in write mode
                             AloopySQLHelper helper = AloopySQLHelper.getInstance(getBaseContext());

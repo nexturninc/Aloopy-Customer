@@ -19,6 +19,8 @@
     <string name="action_signup">Register</string>
     <string name="lbl_SignUp">Customer Registration</string>
     <string name="btnUpdateProfile">Update Profile</string>
+    <string name="SHARE_PREF_UserName">Username</string>
+    <string name="action_logout">Log Out</string>
 
 
 </resources>

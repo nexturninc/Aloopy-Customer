@@ -4,11 +4,14 @@ package com.customer.aloopy.aloopycustomerapp;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -82,7 +85,6 @@ public class StampList extends Fragment {
 
 
 
-
         return rootView;
     }
 
@@ -92,14 +94,89 @@ public class StampList extends Fragment {
     }
 
     public void GetStamps() {
+
         if (mAuthTask != null) {
             return;
         }
 
         showProgress(true);
-        mAuthTask = new StampSetTask(UserID);
-        mAuthTask.execute((Void) null);
 
+        AloopySQLHelper helper = AloopySQLHelper.getInstance(this.getActivity());
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        if (UserID == null || UserID.isEmpty()
+                || Common.GetInternetConnectivity((ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            mAuthTask = new StampSetTask(UserID);
+            mAuthTask.execute((Void) null);
+        }
+        else
+        {
+            stampData = new ArrayList<CustomerStampSetContract>();
+
+            //GET DATA FROM DB
+            String[] projection = {
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_ID,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume,
+                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_End_Date
+            };
+
+            Cursor c = db.query(
+                    CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME,  // The table to query
+                    projection,                               // The columns to return
+                    null,                                // The columns for the WHERE clause
+                    null,                            // The values for the WHERE clause
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
+
+            while(c.moveToNext()) {
+
+                CustomerStampSetContract stampItem = new CustomerStampSetContract();
+                stampItem.CustomerId = UserID;
+                stampItem.CustomerStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID));
+                stampItem.StampTitle = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title));
+                stampItem.StoreStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID));
+                stampItem.StampVolume = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume));
+                stampItem.BackgroundColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color));
+                stampItem.BackgroundColor2 = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2));
+                stampItem.TextColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color));
+                stampItem.StampCount = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count));
+                stampItem.MerchantId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id));
+                stampItem.MerchantName = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name));
+                stampItem.MerchantLogoH = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H));
+                stampItem.MerchantLogoV = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V));
+                stampItem.StampIcon =c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon));
+                stampItem.RewardImage = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image));
+                stampItem.QRCode = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code));
+                stampItem.DateCreated = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created));
+                stampItem.DateModified = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified));
+
+                stampData.add(stampItem);
+            }
+
+            stampSetAdapter = new StampSetAdapter(getActivity(), R.layout.stamp_set_row, stampData);
+            gridview.setAdapter(stampSetAdapter);
+
+            showProgress(false);
+        }
     }
 
     public class StampSetTask extends AsyncTask<Void, Void, Boolean> {
@@ -121,7 +198,6 @@ public class StampList extends Fragment {
             try {
 
                 JSONObject jsonParam = new JSONObject();
-
 
                 Common comm = new Common();
                 comm.setAPIURL(getString(R.string.AloopyAPIURL));
@@ -238,6 +314,10 @@ public class StampList extends Fragment {
 
                 //finish();
             } else {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity().getBaseContext());
+                dialog.setTitle("Message Alert");
+                dialog.setMessage("Failed tor retrieve Stamp List!");
+                dialog.show();
                 //mPasswordView.setError(getString(R.string.error_incorrect_password));
                 //mPasswordView.requestFocus();
             }
