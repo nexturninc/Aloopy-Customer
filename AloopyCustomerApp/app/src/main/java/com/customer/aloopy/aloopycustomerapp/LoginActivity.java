@@ -345,7 +345,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     }
                 }
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
+                String message = ex.getMessage();
             }
 
             if(loginSuccess) {

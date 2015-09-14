@@ -2,6 +2,8 @@ package com.customer.aloopy.aloopycustomerapp;
 
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -173,5 +175,21 @@ public class Common {
         return ImageLoaderInstance;
     }
 
+    public static boolean GetInternetConnectivity(ConnectivityManager connectivityManager){
+
+        boolean connected = false;
+        //ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        }
+        else
+            connected = false;
+
+
+        return connected;
+
+    }
 }
 
