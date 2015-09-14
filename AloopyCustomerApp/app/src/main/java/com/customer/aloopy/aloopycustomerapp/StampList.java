@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ public class StampList extends Fragment {
 
         mProgressBar = ((ProgressBar)rootView.findViewById(R.id.login_progress));
         mStampListBody = (rootView.findViewById(R.id.dvStampListBody));
+        Button btnRefresh = (Button)rootView.findViewById(R.id.btnRefresh);
 
         //GET SHARED PREFERENCES
         SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
@@ -66,7 +68,7 @@ public class StampList extends Fragment {
 
         gridview = (GridView)rootView.findViewById(R.id.gvStampList);
 
-        GetStamps();
+        GetStamps(false);
 
         //GET DATA
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -83,6 +85,12 @@ public class StampList extends Fragment {
         });
 
 
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GetStamps(true);
+            }
+        });
 
 
         return rootView;
@@ -93,7 +101,7 @@ public class StampList extends Fragment {
         return fragment;
     }
 
-    public void GetStamps() {
+    public void GetStamps(boolean forceAPIQuery) {
 
         if (mAuthTask != null) {
             return;
@@ -104,78 +112,91 @@ public class StampList extends Fragment {
         AloopySQLHelper helper = AloopySQLHelper.getInstance(this.getActivity());
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        if (UserID == null || UserID.isEmpty()
-                || Common.GetInternetConnectivity((ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
-            mAuthTask = new StampSetTask(UserID);
-            mAuthTask.execute((Void) null);
-        }
-        else
-        {
-            stampData = new ArrayList<CustomerStampSetContract>();
+        //GET DATA FROM DB
+        String[] projection = {
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_End_Date
+        };
 
-            //GET DATA FROM DB
-            String[] projection = {
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_ID,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume,
-                    CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_End_Date
-            };
+        Cursor c = db.query(
+                CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
 
-            Cursor c = db.query(
-                    CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME,  // The table to query
-                    projection,                               // The columns to return
-                    null,                                // The columns for the WHERE clause
-                    null,                            // The values for the WHERE clause
-                    null,                                     // don't group the rows
-                    null,                                     // don't filter by row groups
-                    null                                 // The sort order
-            );
-
-            while(c.moveToNext()) {
-
-                CustomerStampSetContract stampItem = new CustomerStampSetContract();
-                stampItem.CustomerId = UserID;
-                stampItem.CustomerStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID));
-                stampItem.StampTitle = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title));
-                stampItem.StoreStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID));
-                stampItem.StampVolume = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume));
-                stampItem.BackgroundColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color));
-                stampItem.BackgroundColor2 = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2));
-                stampItem.TextColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color));
-                stampItem.StampCount = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count));
-                stampItem.MerchantId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id));
-                stampItem.MerchantName = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name));
-                stampItem.MerchantLogoH = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H));
-                stampItem.MerchantLogoV = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V));
-                stampItem.StampIcon =c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon));
-                stampItem.RewardImage = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image));
-                stampItem.QRCode = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code));
-                stampItem.DateCreated = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created));
-                stampItem.DateModified = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified));
-
-                stampData.add(stampItem);
-            }
-
-            stampSetAdapter = new StampSetAdapter(getActivity(), R.layout.stamp_set_row, stampData);
-            gridview.setAdapter(stampSetAdapter);
-
+        if(forceAPIQuery &&
+                !Common.GetInternetConnectivity((ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
             showProgress(false);
+            Toast.makeText(getActivity().getBaseContext(), getString(R.string.message_Internet_Required), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            if (forceAPIQuery
+                    || (Common.GetInternetConnectivity((ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+                        && c.getCount() == 0) {
+
+                //GET FROM API
+
+                mAuthTask = new StampSetTask(UserID);
+                mAuthTask.execute((Void) null);
+
+            }
+            else //GET FROM DATABASE
+            {
+
+                stampData = new ArrayList<CustomerStampSetContract>();
+
+                while (c.moveToNext()) {
+
+                    CustomerStampSetContract stampItem = new CustomerStampSetContract();
+                    stampItem.CustomerId = UserID;
+                    stampItem.CustomerStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID));
+                    stampItem.StampTitle = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title));
+                    stampItem.StoreStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID));
+                    stampItem.StampVolume = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume));
+                    stampItem.BackgroundColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color));
+                    stampItem.BackgroundColor2 = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2));
+                    stampItem.TextColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color));
+                    stampItem.StampCount = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count));
+                    stampItem.MerchantId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id));
+                    stampItem.MerchantName = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name));
+                    stampItem.MerchantLogoH = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H));
+                    stampItem.MerchantLogoV = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V));
+                    stampItem.StampIcon = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon));
+                    stampItem.RewardImage = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image));
+                    stampItem.QRCode = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code));
+                    stampItem.DateCreated = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created));
+                    stampItem.DateModified = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified));
+
+                    stampData.add(stampItem);
+                }
+
+                stampSetAdapter = new StampSetAdapter(getActivity(), R.layout.stamp_set_row, stampData);
+                gridview.setAdapter(stampSetAdapter);
+
+                showProgress(false);
+            }
         }
     }
 

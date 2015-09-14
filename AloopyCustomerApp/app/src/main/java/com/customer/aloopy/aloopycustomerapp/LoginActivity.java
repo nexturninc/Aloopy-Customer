@@ -78,7 +78,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     }
                 }
                 else {
-                    mPasswordView.setError("Internet connection is required to log in.");
+                    mPasswordView.setError(getString(R.string.message_Internet_Required));
                     mPasswordView.requestFocus();
                 }
 

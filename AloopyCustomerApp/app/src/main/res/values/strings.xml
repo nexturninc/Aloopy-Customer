@@ -4,6 +4,9 @@
     <string name="EXTRA_LoginDisplay_Name">com.customer.aloopy.LoginDisplay_Name</string>
     <string name="EXTRA_StampDetail_Id">com.customer.aloopy.aloopycustomerapp.CustomerStampId</string>
     <string name="SHARE_PREF_UserId">UserId</string>
+    <string name="SHARE_PREF_UserName">Username</string>
+
+    <string name="message_Internet_Required">This requires an active Internet connection.</string>
 
     <string name="app_name">Aloopy Customer App</string>
     <string name="WelcomeText">"Welcome, "</string>
@@ -19,8 +22,10 @@
     <string name="action_signup">Register</string>
     <string name="lbl_SignUp">Customer Registration</string>
     <string name="btnUpdateProfile">Update Profile</string>
-    <string name="SHARE_PREF_UserName">Username</string>
     <string name="action_logout">Log Out</string>
+    <string name="btnRefresh">REFRESH</string>
+
+
 
 
 </resources>
