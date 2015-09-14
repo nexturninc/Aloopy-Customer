@@ -4,10 +4,12 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
@@ -61,9 +64,6 @@ public class CustomerProfile extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_profile);
 
-        AloopySQLHelper helper = AloopySQLHelper.getInstance(this);
-        SQLiteDatabase db = helper.getReadableDatabase();
-
         //INITIALIZE CONTROLS
         mProgressBar = (ProgressBar)findViewById(R.id.login_progress);
         mCustomerProfileBody = findViewById(R.id.dvCustomerProfileBody);
@@ -81,6 +81,49 @@ public class CustomerProfile extends ActionBarActivity {
 
         btnUpdateProfile = (Button)findViewById(R.id.btnSave);
 
+        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(!Common.GetInternetConnectivity((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE)))
+                {
+                    Toast.makeText(getBaseContext(), getString(R.string.message_Internet_Required), Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    //UPDATE PROFILE
+                    showProgress(true);
+
+                    if (txtPassword.getText().length() > 0) {
+                        if (txtCPassword.getText().length() > 0) {
+                            txtCPassword.setError("Password Confirmation is required!");
+                        } else if (!txtPassword.getText().toString().equals(txtCPassword.getText().toString())) {
+                            txtCPassword.setError("Password Confirmation does not match!");
+                        }
+                    } else if (txtEmailAddress.getText().length() > 0) {
+                        txtEmailAddress.setError("Email Address is required!");
+                    } else {
+
+                        mUpdateTask = new UpdateProfileTask(CustomerId,
+                                txtEmailAddress.getText().toString(),
+                                lblUsername.getText().toString(), txtPassword.getText().toString(),
+                                txtFirstName.getText().toString(), txtLastName.getText().toString());
+                        mUpdateTask.execute((Void) null);
+
+                    }
+                }
+            }
+        });
+
+
+        LoadCustomerProfile();
+
+    }
+
+    private void LoadCustomerProfile()
+    {
+        AloopySQLHelper helper = AloopySQLHelper.getInstance(this);
+        SQLiteDatabase db = helper.getReadableDatabase();
 
         //GET DATA FROM DB
         String[] projection = {
@@ -117,39 +160,9 @@ public class CustomerProfile extends ActionBarActivity {
         txtLastName.setText(c.getString(c.getColumnIndexOrThrow(CustomerInfoContract.CustomerInformation.COLUMN_NAME_LastName)));
         txtEmailAddress.setText(c.getString(c.getColumnIndexOrThrow(CustomerInfoContract.CustomerInformation.COLUMN_NAME_EmailAddress)));
 
-        btnUpdateProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //UPDATE PROFILE
-                showProgress(true);
-
-                if (txtPassword.getText().length() > 0) {
-                    if (txtCPassword.getText().length() > 0) {
-                        txtCPassword.setError("Password Confirmation is required!");
-                    } else if (!txtPassword.getText().toString().equals(txtCPassword.getText().toString())) {
-                        txtCPassword.setError("Password Confirmation does not match!");
-                    }
-                }
-                else if (txtEmailAddress.getText().length() > 0) {
-                    txtEmailAddress.setError("Email Address is required!");
-                }
-                else {
-
-                    mUpdateTask = new UpdateProfileTask(CustomerId,
-                            txtEmailAddress.getText().toString(),
-                            lblUsername.getText().toString(), txtPassword.getText().toString(),
-                            txtFirstName.getText().toString(), txtLastName.getText().toString());
-                    mUpdateTask.execute((Void) null);
-
-                }
-            }
-        });
-
-
         db.close();
-
     }
+
 
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -238,20 +251,6 @@ public class CustomerProfile extends ActionBarActivity {
 
                         if(customerInfo != null && customerInfo.length() > 0) {
                             userId = customerInfo.getJSONObject(0).getString("id");
-                            userDisplay = customerInfo.getJSONObject(0).getString("firstName")  +
-                                    " " +
-                                    customerInfo.getJSONObject(0).getString("lastName") +
-                                    " (" +
-                                    customerInfo.getJSONObject(0).getString("code") +
-                                    ")";
-
-                            //SAVE TO SHARED PREFERENCES
-                            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                            SharedPreferences.Editor editor = mSettings.edit();
-                            editor.putString(getString(R.string.SHARE_PREF_UserId), userId);
-                            editor.putString(getString(R.string.SHARE_PREF_UserName), userDisplay);
-                            editor.commit();
-
 
                             // Gets the data repository in write mode
                             AloopySQLHelper helper = AloopySQLHelper.getInstance(getBaseContext());
