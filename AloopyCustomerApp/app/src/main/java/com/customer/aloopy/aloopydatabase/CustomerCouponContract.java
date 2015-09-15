@@ -7,6 +7,10 @@ import android.provider.BaseColumns;
  */
 public final class CustomerCouponContract {
 
+    public String QRCodeImage;
+    public String MainBannerImage;
+
+
     public CustomerCouponContract() {
     }
 

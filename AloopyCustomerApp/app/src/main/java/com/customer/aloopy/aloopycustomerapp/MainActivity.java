@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
+import com.customer.aloopy.aloopydatabase.CustomerCouponContract;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
 import com.customer.aloopy.aloopydatabase.CustomerStampSetContract;
 
@@ -85,6 +86,7 @@ public class MainActivity extends ActionBarActivity {
 
             db.delete(CustomerInfoContract.CustomerInformation.TABLE_NAME, null, null);
             db.delete(CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME, null, null);
+            db.delete(CustomerCouponContract.CustomerCouponInformation.TABLE_NAME, null, null);
 
             SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             SharedPreferences.Editor editor = mSettings.edit();
@@ -121,7 +123,8 @@ public class MainActivity extends ActionBarActivity {
                     StampList stampList = StampList.newInstance();
                     return stampList;
                 case 1:
-                    return TestFragment.newInstance(1);
+                    CouponList couponList = CouponList.newInstance();
+                    return couponList;
                 case 2:
                     return TestFragment.newInstance(2);
                 default:
