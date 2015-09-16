@@ -97,6 +97,8 @@ public class CouponAdapter extends ArrayAdapter<CustomerCouponContract> {
 
         if(item.Claimed == null || item.Claimed.equals("false"))
             holder.lblClaimed.setVisibility(View.GONE);
+        else
+            holder.lblClaimed.setVisibility(View.VISIBLE);
 
 
         return row;
