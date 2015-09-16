@@ -114,17 +114,14 @@ public class CouponList extends Fragment {
 
         //GET DATA FROM DB
         String[] projection = {
-                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Customer_Coupon_ID,
-                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Coupon_ID,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Coupon_Name,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Start_Date,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_End_Date,
-                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Store_Id,
-                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Store_Coupon_Id,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Main_Banner_Image,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_QR_Code_Image,
                 CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Claimed,
-                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Created
+                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Created,
+                CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Modified
         };
 
         Cursor c = db.query(
@@ -161,10 +158,17 @@ public class CouponList extends Fragment {
                 while (c.moveToNext()) {
 
                     CustomerCouponContract resultItem = new CustomerCouponContract();
+                    resultItem.CouponName = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Coupon_Name));
                     resultItem.QRCodeImage = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_QR_Code_Image));
                     resultItem.MainBannerImage = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Main_Banner_Image));
+                    resultItem.Claimed = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Claimed));
+                    resultItem.StartDate = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Start_Date));
+                    resultItem.EndDate = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_End_Date));
+                    resultItem.DateCreated = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Created));
+                    resultItem.DateModified = c.getString(c.getColumnIndexOrThrow(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Modified));
 
                     resultData.add(resultItem);
+
                 }
 
                 couponAdapter = new CouponAdapter(getActivity(), R.layout.coupon_row, resultData);
@@ -229,6 +233,12 @@ public class CouponList extends Fragment {
                                 CustomerCouponContract resultItem = new CustomerCouponContract();
                                 resultItem.MainBannerImage = stampSetArray.getJSONObject(ctr).getJSONObject("mainBannerImage3x").getString("imageURL");
                                 resultItem.QRCodeImage = stampSetArray.getJSONObject(ctr).getJSONObject("qrCodeImage_3x").getString("imageFileName");
+                                resultItem.Claimed = stampSetArray.getJSONObject(ctr).getString("claimed");
+                                resultItem.StartDate = stampSetArray.getJSONObject(ctr).getString("startDate");
+                                resultItem.EndDate = stampSetArray.getJSONObject(ctr).getString("endDate");
+                                resultItem.CouponName = stampSetArray.getJSONObject(ctr).getString("couponName");
+                                resultItem.DateCreated = stampSetArray.getJSONObject(ctr).getString("dateCreated");
+                                resultItem.DateModified = stampSetArray.getJSONObject(ctr).getString("dateModified");
 
                                 resultData.add(resultItem);
 
@@ -242,10 +252,11 @@ public class CouponList extends Fragment {
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_End_Date, stampSetArray.getJSONObject(ctr).getString("endDate"));
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Store_Id, stampSetArray.getJSONObject(ctr).getString("storeID"));
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Store_Coupon_Id, stampSetArray.getJSONObject(ctr).getString("storeCouponID"));
-                                values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Main_Banner_Image, stampSetArray.getJSONObject(ctr).getJSONObject("mainBannerImage3x").getString("filePath"));
+                                values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Main_Banner_Image, stampSetArray.getJSONObject(ctr).getJSONObject("mainBannerImage3x").getString("imageURL"));
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_QR_Code_Image, stampSetArray.getJSONObject(ctr).getJSONObject("qrCodeImage_3x").getString("imageFileName"));
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Claimed, stampSetArray.getJSONObject(ctr).getString("claimed"));
                                 values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Created, stampSetArray.getJSONObject(ctr).getString("dateCreated"));
+                                values.put(CustomerCouponContract.CustomerCouponInformation.COLUMN_NAME_Date_Modified, stampSetArray.getJSONObject(ctr).getString("dateModified"));
 
                                 long newRowId;
                                 newRowId = db.insert(

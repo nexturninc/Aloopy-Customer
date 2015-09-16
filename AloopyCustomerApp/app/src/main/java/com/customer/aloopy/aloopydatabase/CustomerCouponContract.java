@@ -2,14 +2,21 @@ package com.customer.aloopy.aloopydatabase;
 
 import android.provider.BaseColumns;
 
+import java.util.Date;
+
 /**
  * Created by imbisibol on 9/15/2015.
  */
 public final class CustomerCouponContract {
 
+    public String CouponName;
     public String QRCodeImage;
     public String MainBannerImage;
-
+    public String Claimed;
+    public String StartDate;
+    public String EndDate;
+    public String DateCreated;
+    public String DateModified;
 
     public CustomerCouponContract() {
     }
@@ -30,7 +37,8 @@ public final class CustomerCouponContract {
                     CustomerCouponInformation.COLUMN_NAME_Main_Banner_Image + TEXT_TYPE + COMMA_SEP +
                     CustomerCouponInformation.COLUMN_NAME_QR_Code_Image + TEXT_TYPE + COMMA_SEP +
                     CustomerCouponInformation.COLUMN_NAME_Claimed + TEXT_TYPE + COMMA_SEP +
-                    CustomerCouponInformation.COLUMN_NAME_Date_Created + TEXT_TYPE +
+                    CustomerCouponInformation.COLUMN_NAME_Date_Created + TEXT_TYPE + COMMA_SEP +
+                    CustomerCouponInformation.COLUMN_NAME_Date_Modified + TEXT_TYPE +
                     " )";
     public static final String SQL_DELETE_TABLE =
             "DROP TABLE IF EXISTS " + CustomerCouponInformation.TABLE_NAME;
@@ -49,6 +57,7 @@ public final class CustomerCouponContract {
         public static final String COLUMN_NAME_QR_Code_Image = "QRCodeImage";
         public static final String COLUMN_NAME_Claimed = "Claimed";
         public static final String COLUMN_NAME_Date_Created = "DateCreated";
+        public static final String COLUMN_NAME_Date_Modified = "DateModified";
 
     }
 }
