@@ -84,6 +84,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textSize="14dp"
+                android:rotation="-45.00"
+                android:textColor="#FF0000"
+                android:id="@+id/lblClaimedDate"
+                android:textStyle="bold"
+                android:layout_alignTop="@+id/lblCalimed"
+                android:layout_alignLeft="@+id/lblCalimed"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
                 android:text="CLAIMED!"
                 android:textSize="24dp"
                 android:rotation="-45.00"

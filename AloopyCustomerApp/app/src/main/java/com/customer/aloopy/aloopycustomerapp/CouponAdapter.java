@@ -63,6 +63,7 @@ public class CouponAdapter extends ArrayAdapter<CustomerCouponContract> {
             holder.imgCoupon = (ImageView) row.findViewById(R.id.imgCoupon);
             holder.imgQRCode = (ImageView) row.findViewById(R.id.imgQRCode);
             holder.lblClaimed = (TextView) row.findViewById(R.id.lblCalimed);
+            holder.lblClaimedDate = (TextView) row.findViewById(R.id.lblClaimedDate);
             holder.lblCouponTitle = (TextView) row.findViewById(R.id.lblCouponTitle);
             holder.lblStartDate = (TextView) row.findViewById(R.id.lblStartDate);
             holder.lblEndDate = (TextView) row.findViewById(R.id.lblEndDate);
@@ -76,6 +77,7 @@ public class CouponAdapter extends ArrayAdapter<CustomerCouponContract> {
         CustomerCouponContract item = data.get(position);
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        SimpleDateFormat formatterB = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         SimpleDateFormat destFormat = new SimpleDateFormat("MM-dd-yyyy");
 
         Date dateItem;
@@ -95,6 +97,14 @@ public class CouponAdapter extends ArrayAdapter<CustomerCouponContract> {
         if (item.QRCodeImage != null && item.QRCodeImage != "")
             Common.getImageLoader(null).displayImage(item.QRCodeImage, holder.imgQRCode);
 
+        try {
+            dateItem = formatterB.parse(item.DateModified);
+            holder.lblClaimedDate.setText(destFormat.format(dateItem));
+        }
+        catch(Exception ex)
+        {
+            String abc = ex.getMessage();
+        }
         if(item.Claimed == null || item.Claimed.equals("false"))
             holder.lblClaimed.setVisibility(View.GONE);
         else
@@ -109,11 +119,11 @@ public class CouponAdapter extends ArrayAdapter<CustomerCouponContract> {
     {
         public TextView lblCouponTitle;
         public TextView lblClaimed;
+        public TextView lblClaimedDate;
         public ImageView imgQRCode;
         public ImageView imgCoupon;
         public TextView lblStartDate;
         public TextView lblEndDate;
-        public TextView lblDateUpdated;
     }
 
 }
