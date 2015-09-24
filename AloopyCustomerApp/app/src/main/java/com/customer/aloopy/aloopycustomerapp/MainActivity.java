@@ -126,7 +126,8 @@ public class MainActivity extends ActionBarActivity {
                     CouponList couponList = CouponList.newInstance();
                     return couponList;
                 case 2:
-                    return TestFragment.newInstance(2);
+                    LoyaltyCardList cardList = LoyaltyCardList.newInstance();
+                    return cardList;
                 default:
                     return TestFragment.newInstance(999);
             }

@@ -1,7 +1,7 @@
 package com.customer.aloopy.aloopycustomerapp;
 
 import android.annotation.TargetApi;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
