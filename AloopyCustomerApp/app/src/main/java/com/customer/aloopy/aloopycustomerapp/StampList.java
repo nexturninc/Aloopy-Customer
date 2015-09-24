@@ -235,6 +235,8 @@ public class StampList extends Fragment {
         protected void onCancelled() {
             mAuthTask = null;
             showProgress(false);
+
+
         }
     }
 

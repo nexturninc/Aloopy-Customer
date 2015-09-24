@@ -6,7 +6,7 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:hint="Username"
+        android:hint="@string/lbl_username"
         android:id="@+id/txtUsername"/>
 
     <EditText
