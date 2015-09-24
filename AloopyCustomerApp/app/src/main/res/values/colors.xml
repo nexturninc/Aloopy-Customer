@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="stampBodyBG">#AAAAAA</color>
+    <color name="stampBodyBG">#FFF</color>
     <color name="loginBodyBG">#81CFE0</color>
+
+    <color name="baseBG">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
 </resources>
