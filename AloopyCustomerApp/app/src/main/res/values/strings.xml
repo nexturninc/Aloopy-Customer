@@ -3,6 +3,7 @@
     <string name="SharedPrefName">com.customer.aloopy.aloopycustomerapp</string>
     <string name="EXTRA_LoginDisplay_Name">com.customer.aloopy.LoginDisplay_Name</string>
     <string name="EXTRA_StampDetail_Id">com.customer.aloopy.aloopycustomerapp.CustomerStampId</string>
+    <string name="EXTRA_CardDetail_Id">com.customer.aloopy.aloopycustomerapp.CustomerCardID</string>
     <string name="SHARE_PREF_UserId">UserId</string>
     <string name="SHARE_PREF_UserName">Username</string>
 
@@ -24,6 +25,9 @@
     <string name="btnUpdateProfile">Update Profile</string>
     <string name="action_logout">Log Out</string>
     <string name="btnRefresh">REFRESH</string>
+
+    <string name="CardImage">CardImage</string>
+    <string name="QRCodeImage">QRCode</string>
 
 
 
