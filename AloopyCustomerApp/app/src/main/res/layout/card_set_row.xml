@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCardID"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCardTitle"
+        android:layout_below="@+id/txtCardID"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCardVolume"
+        android:layout_below="@+id/txtCardTitle"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtDateExpiration"
+        android:layout_marginLeft="29dp"
+        android:layout_marginStart="29dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/txtCardID"
+        android:layout_toEndOf="@+id/txtCardID" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCardPrice"
+        android:layout_below="@+id/txtDateExpiration"
+        android:layout_alignLeft="@+id/txtDateExpiration"
+        android:layout_alignStart="@+id/txtDateExpiration" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtMerchantID"
+        android:layout_below="@+id/txtCardVolume"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtTotalPoints"
+        android:layout_below="@+id/txtMerchantID"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCustomerID"
+        android:layout_below="@+id/txtCardPrice"
+        android:layout_alignLeft="@+id/txtCardPrice"
+        android:layout_alignStart="@+id/txtCardPrice" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCustomerCardID"
+        android:layout_above="@+id/txtTotalPoints"
+        android:layout_alignLeft="@+id/txtCustomerID"
+        android:layout_alignStart="@+id/txtCustomerID" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtDateCreated"
+        android:layout_alignTop="@+id/txtTotalPoints"
+        android:layout_alignLeft="@+id/txtCustomerCardID"
+        android:layout_alignStart="@+id/txtCustomerCardID" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgCard"
+        android:contentDescription="@string/CardImage"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/imgQRCode"
+        android:contentDescription="@string/QRCodeImage"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+</RelativeLayout>
