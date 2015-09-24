@@ -4,8 +4,10 @@ package com.customer.aloopy.aloopycustomerapp;
 import java.util.Locale;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +17,11 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+
+import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
+import com.customer.aloopy.aloopydatabase.CustomerCouponContract;
+import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
+import com.customer.aloopy.aloopydatabase.CustomerStampSetContract;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -54,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -69,6 +76,27 @@ public class MainActivity extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
+        else if (id == R.id.action_profile){
+            Intent intent = new Intent(getBaseContext(), CustomerProfile.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.action_logout){
+            AloopySQLHelper helper = AloopySQLHelper.getInstance(getBaseContext());
+            SQLiteDatabase db = helper.getWritableDatabase();
+
+            db.delete(CustomerInfoContract.CustomerInformation.TABLE_NAME, null, null);
+            db.delete(CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME, null, null);
+            db.delete(CustomerCouponContract.CustomerCouponInformation.TABLE_NAME, null, null);
+
+            SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            SharedPreferences.Editor editor = mSettings.edit();
+            editor.clear();
+            editor.commit();
+
+            Intent intent = new Intent(getBaseContext(), LoginActivity.class);
+            startActivity(intent);
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -92,15 +120,13 @@ public class MainActivity extends ActionBarActivity {
             switch(position)
             {
                 case 0:
-                    CustomerProfile customerProfile = CustomerProfile.newInstance();
-
-                    return customerProfile;
-                case 1:
-                    return TestFragment.newInstance(1);
-                case 2:
                     StampList stampList = StampList.newInstance();
-
                     return stampList;
+                case 1:
+                    CouponList couponList = CouponList.newInstance();
+                    return couponList;
+                case 2:
+                    return TestFragment.newInstance(2);
                 default:
                     return TestFragment.newInstance(999);
             }
@@ -118,11 +144,11 @@ public class MainActivity extends ActionBarActivity {
             Locale l = Locale.getDefault();
             switch (position) {
                 case 0:
-                    return getString(R.string.title_section1).toUpperCase(l);
+                    return getString(R.string.title_section3).toUpperCase(l);
                 case 1:
                     return getString(R.string.title_section2).toUpperCase(l);
                 case 2:
-                    return getString(R.string.title_section3).toUpperCase(l);
+                    return getString(R.string.title_section1).toUpperCase(l);
             }
             return null;
         }

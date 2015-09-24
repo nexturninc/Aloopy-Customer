@@ -1,12 +1,17 @@
 package com.customer.aloopy.aloopycustomerapp;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,7 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
@@ -37,7 +44,10 @@ public class StampList extends Fragment {
     public GridView gridview;
     public ArrayList<CustomerStampSetContract> stampData = new ArrayList<CustomerStampSetContract>();
     public StampSetAdapter stampSetAdapter;
+
     private StampSetTask mAuthTask = null;
+    private ProgressBar mProgressBar;
+    private View mStampListBody;
 
     public StampList() {
     }
@@ -48,13 +58,17 @@ public class StampList extends Fragment {
 
         View rootView = inflater.inflate(R.layout.stamp_list, container, false);
 
+        mProgressBar = ((ProgressBar)rootView.findViewById(R.id.login_progress));
+        mStampListBody = (rootView.findViewById(R.id.dvStampListBody));
+        Button btnRefresh = (Button)rootView.findViewById(R.id.btnRefresh);
+
         //GET SHARED PREFERENCES
         SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getActivity().getBaseContext());
         UserID = mSettings.getString(getActivity().getString(R.string.SHARE_PREF_UserId), null);
 
         gridview = (GridView)rootView.findViewById(R.id.gvStampList);
 
-        GetStamps();
+        GetStamps(false);
 
         //GET DATA
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -71,6 +85,14 @@ public class StampList extends Fragment {
         });
 
 
+        btnRefresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GetStamps(true);
+            }
+        });
+
+
         return rootView;
     }
 
@@ -79,15 +101,103 @@ public class StampList extends Fragment {
         return fragment;
     }
 
-    public void GetStamps() {
+    public void GetStamps(boolean forceAPIQuery) {
+
         if (mAuthTask != null) {
             return;
         }
 
         showProgress(true);
-        mAuthTask = new StampSetTask(UserID);
-        mAuthTask.execute((Void) null);
 
+        AloopySQLHelper helper = AloopySQLHelper.getInstance(this.getActivity());
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        //GET DATA FROM DB
+        String[] projection = {
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume,
+                CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_End_Date
+        };
+
+        Cursor c = db.query(
+                CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        if(forceAPIQuery &&
+                !Common.GetInternetConnectivity((ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE))) {
+            showProgress(false);
+            Toast.makeText(getActivity().getBaseContext(), getString(R.string.message_Internet_Required), Toast.LENGTH_SHORT).show();
+        }
+        else {
+            if (forceAPIQuery
+                    || (Common.GetInternetConnectivity((ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE)))
+                        && c.getCount() == 0) {
+
+                //GET FROM API
+
+                mAuthTask = new StampSetTask(UserID);
+                mAuthTask.execute((Void) null);
+
+            }
+            else //GET FROM DATABASE
+            {
+
+                stampData = new ArrayList<CustomerStampSetContract>();
+
+                while (c.moveToNext()) {
+
+                    CustomerStampSetContract stampItem = new CustomerStampSetContract();
+                    stampItem.CustomerId = UserID;
+                    stampItem.CustomerStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Customer_StampSet_ID));
+                    stampItem.StampTitle = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Title));
+                    stampItem.StoreStampSetId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Store_StampSet_ID));
+                    stampItem.StampVolume = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Volume));
+                    stampItem.BackgroundColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color));
+                    stampItem.BackgroundColor2 = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Background_Color2));
+                    stampItem.TextColor = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Text_Color));
+                    stampItem.StampCount = c.getInt(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Count));
+                    stampItem.MerchantId = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Id));
+                    stampItem.MerchantName = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Name));
+                    stampItem.MerchantLogoH = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_H));
+                    stampItem.MerchantLogoV = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Merchant_Logo_V));
+                    stampItem.StampIcon = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Stamp_Icon));
+                    stampItem.RewardImage = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Reward_Image));
+                    stampItem.QRCode = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_QR_Code));
+                    stampItem.DateCreated = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Created));
+                    stampItem.DateModified = c.getString(c.getColumnIndexOrThrow(CustomerStampSetContract.CustomerStampSetInformation.COLUMN_NAME_Date_Modified));
+
+                    stampData.add(stampItem);
+                }
+
+                stampSetAdapter = new StampSetAdapter(getActivity(), R.layout.stamp_set_row, stampData);
+                gridview.setAdapter(stampSetAdapter);
+
+                showProgress(false);
+            }
+        }
     }
 
     public class StampSetTask extends AsyncTask<Void, Void, Boolean> {
@@ -109,7 +219,6 @@ public class StampList extends Fragment {
             try {
 
                 JSONObject jsonParam = new JSONObject();
-
 
                 Common comm = new Common();
                 comm.setAPIURL(getString(R.string.AloopyAPIURL));
@@ -226,6 +335,10 @@ public class StampList extends Fragment {
 
                 //finish();
             } else {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity().getBaseContext());
+                dialog.setTitle("Message Alert");
+                dialog.setMessage("Failed tor retrieve Stamp List!");
+                dialog.show();
                 //mPasswordView.setError(getString(R.string.error_incorrect_password));
                 //mPasswordView.requestFocus();
             }
@@ -241,39 +354,37 @@ public class StampList extends Fragment {
     }
 
 
-    /**
-     * Shows the progress UI and hides the login form.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     public void showProgress(final boolean show) {
-//        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-//        // for very easy animations. If available, use these APIs to fade-in
-//        // the progress spinner.
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-//            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-//
-//            this.setVisibility(show ? View.GONE : View.VISIBLE);
-//            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//                }
-//            });
-//
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mProgressView.animate().setDuration(shortAnimTime).alpha(
-//                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-//                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//                }
-//            });
-//        } else {
-//            // The ViewPropertyAnimator APIs are not available, so simply show
-//            // and hide the relevant UI components.
-//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-//            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-//        }
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mProgressBar.setVisibility(show ? View.GONE : View.VISIBLE);
+            mStampListBody.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mStampListBody.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressBar.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mStampListBody.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
     }
+
 }

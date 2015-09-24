@@ -1,16 +1,24 @@
 package com.customer.aloopy.aloopycustomerapp;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
@@ -25,6 +33,8 @@ import org.w3c.dom.Text;
 public class SignupActivity extends Activity {
 
     private SignupTask mSignupTask = null;
+    private ProgressBar mProgressBar;
+    private View mSignupForm;
 
     public SignupActivity()
     {
@@ -41,9 +51,17 @@ public class SignupActivity extends Activity {
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                attemptLogin();
+                if (Common.GetInternetConnectivity((ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE))) {
+                    attemptLogin();
+                }
+                else    {
+                    Toast.makeText(getBaseContext(), getString(R.string.message_Internet_Required), Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
+        mSignupForm = (findViewById(R.id.dvSignupForm));
+        mProgressBar = ((ProgressBar)findViewById(R.id.login_progress));
 
     }
 
@@ -70,6 +88,8 @@ public class SignupActivity extends Activity {
                 else if (txtEmailAddress.getText().length() == 0)
                     txtEmailAddress.setError("Email Address is required!");
                 else {
+                    showProgress(true);
+
                     mSignupTask = new SignupTask(txtEmailAddress.getText().toString(),
                             txtUserName.getText().toString(), txtPassword.getText().toString(),
                             txtFirstName.getText().toString(), txtLastName.getText().toString());
@@ -82,7 +102,40 @@ public class SignupActivity extends Activity {
     }
 
 
-        public class SignupTask extends AsyncTask<Void, Void, Boolean> {
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+    public void showProgress(final boolean show) {
+        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+        // for very easy animations. If available, use these APIs to fade-in
+        // the progress spinner.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+
+            mProgressBar.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignupForm.animate().setDuration(shortAnimTime).alpha(
+                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mSignupForm.setVisibility(show ? View.GONE : View.VISIBLE);
+                }
+            });
+
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mProgressBar.animate().setDuration(shortAnimTime).alpha(
+                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+                }
+            });
+        } else {
+            // The ViewPropertyAnimator APIs are not available, so simply show
+            // and hide the relevant UI components.
+            mProgressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+            mSignupForm.setVisibility(show ? View.GONE : View.VISIBLE);
+        }
+    }
+
+    public class SignupTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mEmail;
         private final String mUsername;
@@ -126,7 +179,7 @@ public class SignupActivity extends Activity {
 
                     String strSuccess = jsonResponse.getString("success");
 
-                    /*
+
                     if (strSuccess == "true") {
 
                         JSONArray customerInfo = jsonResponse.getJSONArray("customerInfo");
@@ -179,10 +232,10 @@ public class SignupActivity extends Activity {
 
                         loginSuccess = true;
                     }
-                    */
                 }
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
             }
 
             if(loginSuccess) {
@@ -199,7 +252,7 @@ public class SignupActivity extends Activity {
         @Override
         protected void onPostExecute(final Boolean success) {
             mSignupTask = null;
-            //showProgress(false);
+            showProgress(false);
 
             if (success) {
                 finish();
@@ -212,7 +265,7 @@ public class SignupActivity extends Activity {
         @Override
         protected void onCancelled() {
             mSignupTask = null;
-            //showProgress(false);
+            showProgress(false);
         }
     }
 
