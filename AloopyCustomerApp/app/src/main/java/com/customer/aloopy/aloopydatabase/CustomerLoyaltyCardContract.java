@@ -42,7 +42,7 @@ public class CustomerLoyaltyCardContract {
                     CustomerLoyaltyCardInformation.COLUMN_NAME_Total_Points + TEXT_TYPE + COMMA_SEP +
                     CustomerLoyaltyCardInformation.COLUMN_NAME_Customer_ID + TEXT_TYPE + COMMA_SEP +
                     CustomerLoyaltyCardInformation.COLUMN_NAME_Customer_Card_ID + TEXT_TYPE + COMMA_SEP +
-                    CustomerLoyaltyCardInformation.COLUMN_NAME_Date_Created + DATE_TYPE + COMMA_SEP +
+                    CustomerLoyaltyCardInformation.COLUMN_NAME_Date_Created + DATE_TYPE +
                     " )";
     public static final String SQL_DELETE_TABLE =
             "DROP TABLE IF EXISTS " + CustomerLoyaltyCardInformation.TABLE_NAME;
