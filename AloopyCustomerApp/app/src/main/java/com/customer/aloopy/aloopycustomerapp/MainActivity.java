@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.customer.aloopy.aloopydatabase.AloopySQLHelper;
 import com.customer.aloopy.aloopydatabase.CustomerCouponContract;
 import com.customer.aloopy.aloopydatabase.CustomerInfoContract;
+import com.customer.aloopy.aloopydatabase.CustomerLoyaltyCardContract;
 import com.customer.aloopy.aloopydatabase.CustomerStampSetContract;
 
 public class MainActivity extends ActionBarActivity {
@@ -87,6 +88,7 @@ public class MainActivity extends ActionBarActivity {
             db.delete(CustomerInfoContract.CustomerInformation.TABLE_NAME, null, null);
             db.delete(CustomerStampSetContract.CustomerStampSetInformation.TABLE_NAME, null, null);
             db.delete(CustomerCouponContract.CustomerCouponInformation.TABLE_NAME, null, null);
+            db.delete(CustomerLoyaltyCardContract.CustomerLoyaltyCardInformation.TABLE_NAME, null, null);
 
             SharedPreferences mSettings = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             SharedPreferences.Editor editor = mSettings.edit();

@@ -114,7 +114,7 @@ public class LoyaltyCardList extends Fragment{
 
                 Common comm = new Common();
                 comm.setAPIURL(getString(R.string.AloopyAPIURL));
-                jsonResponse = comm.GetAPI("/aloopy/customerloyalty/" + CustomerId);
+                jsonResponse = comm.GetAPI("/aloopy/customerloyalty?customerId=" + CustomerId);
 
                 if(jsonResponse != null)
                 {
