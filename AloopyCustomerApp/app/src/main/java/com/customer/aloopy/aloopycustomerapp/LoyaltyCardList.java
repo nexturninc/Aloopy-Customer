@@ -206,7 +206,7 @@ public class LoyaltyCardList extends Fragment{
             {
                 cardSetAdapter = new CardSetAdapter(getActivity(), R.layout.card_set_row, cardData);
                 gridView.setAdapter(cardSetAdapter);
-                //finish();
+                //finish()
             }
             else
             {
