@@ -1,47 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtCardID"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:id="@+id/frmBody"
+    android:layout_margin="5dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtCardTitle"
-        android:layout_below="@+id/txtCardID"
+        android:textSize="16dp"/>
+
+   <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCardID"
+        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtCardVolume"
-        android:layout_below="@+id/txtCardTitle"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:visibility="gone"
+        />
 
-    <TextView
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Valid until "
+            android:textSize="10dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtDateExpiration"
+            android:textStyle="bold"
+            android:textSize="10dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/txtDateExpiration"
-        android:layout_marginLeft="29dp"
-        android:layout_marginStart="29dp"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/txtCardID"
-        android:layout_toEndOf="@+id/txtCardID" />
-
+        android:layout_height="wrap_content">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtCardPrice"
-        android:layout_below="@+id/txtDateExpiration"
-        android:layout_alignLeft="@+id/txtDateExpiration"
-        android:layout_alignStart="@+id/txtDateExpiration" />
+        android:textSize="10dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -49,15 +64,14 @@
         android:id="@+id/txtMerchantID"
         android:layout_below="@+id/txtCardVolume"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/txtTotalPoints"
-        android:layout_below="@+id/txtMerchantID"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:textSize="10dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -65,7 +79,8 @@
         android:id="@+id/txtCustomerID"
         android:layout_below="@+id/txtCardPrice"
         android:layout_alignLeft="@+id/txtCardPrice"
-        android:layout_alignStart="@+id/txtCardPrice" />
+        android:layout_alignStart="@+id/txtCardPrice"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -73,7 +88,8 @@
         android:id="@+id/txtCustomerCardID"
         android:layout_above="@+id/txtTotalPoints"
         android:layout_alignLeft="@+id/txtCustomerID"
-        android:layout_alignStart="@+id/txtCustomerID" />
+        android:layout_alignStart="@+id/txtCustomerID"
+        android:visibility="gone"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -81,21 +97,38 @@
         android:id="@+id/txtDateCreated"
         android:layout_alignTop="@+id/txtTotalPoints"
         android:layout_alignLeft="@+id/txtCustomerCardID"
-        android:layout_alignStart="@+id/txtCustomerCardID" />
+        android:layout_alignStart="@+id/txtCustomerCardID"
+        android:visibility="gone"/>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+    <com.customer.aloopy.aloopycustomerapp.ProportionalImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:id="@+id/imgCard"
         android:contentDescription="@string/CardImage"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+         />
+        </RelativeLayout>
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+<RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <com.customer.aloopy.aloopycustomerapp.ProportionalImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:id="@+id/imgQRCode"
         android:contentDescription="@string/QRCodeImage"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/abc_input_method_navigation_guard"
+        android:padding="1dp" />
 </RelativeLayout>
+    </FrameLayout>
+</LinearLayout>

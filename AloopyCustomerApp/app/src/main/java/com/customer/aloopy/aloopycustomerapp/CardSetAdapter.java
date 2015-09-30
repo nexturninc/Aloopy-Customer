@@ -81,11 +81,11 @@ public class CardSetAdapter extends ArrayAdapter<CustomerLoyaltyCardContract> {
         CustomerLoyaltyCardContract item = data.get(position);
         holder.CardID.setText(item.CardID);
         holder.CardTitle.setText(item.CardTitle);
-        holder.CardVolume.setText(item.CardVolume);
+        holder.CardVolume.setText(String.valueOf(item.CardVolume));
         holder.DateExpiration.setText(item.DateExpiration);
         holder.CardPrice.setText(item.CardPrice);
         holder.MerchantID.setText(item.MerchantID);
-        holder.TotalPoints.setText(item.TotalPoints);
+        holder.TotalPoints.setText(String.valueOf(item.TotalPoints));
         holder.CustomerID.setText(item.CustomerID);
         holder.CustomerCardID.setText(item.CustomerCardID);
         holder.DateCreated.setText(item.DateCreated);
