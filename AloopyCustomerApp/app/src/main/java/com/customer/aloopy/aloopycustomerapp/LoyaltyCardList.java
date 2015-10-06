@@ -146,12 +146,12 @@ public class LoyaltyCardList extends Fragment{
                             {
                                 CustomerLoyaltyCardContract cardItem =  new CustomerLoyaltyCardContract();
                                 cardItem.CustomerID = CustomerId;
-                                cardItem.CardID = cardSetArray.getJSONObject(ctr).getString("id");
+                                cardItem.CustomerCardID = cardSetArray.getJSONObject(ctr).getString("id");
                                 cardItem.CardImage = cardSetArray.getJSONObject(ctr).getJSONObject("loyaltyCardImage_x3").getString("filePath");
                                 cardItem.CardPrice = cardSetArray.getJSONObject(ctr).getString("cardPrice");
                                 cardItem.CardTitle = cardSetArray.getJSONObject(ctr).getString("title");
                                 cardItem.CardVolume = cardSetArray.getJSONObject(ctr).getInt("volume");
-                                cardItem.CustomerCardID = cardSetArray.getJSONObject(ctr).getString("loyaltyCardID");
+                                cardItem.CardID = cardSetArray.getJSONObject(ctr).getString("loyaltyCardID");
                                 cardItem.DateCreated = cardSetArray.getJSONObject(ctr).getString("dateCreated");
                                 cardItem.DateExpiration = cardSetArray.getJSONObject(ctr).getString("dateExpiration");
                                 cardItem.MerchantID = cardSetArray.getJSONObject(ctr).getString("merchantId");
