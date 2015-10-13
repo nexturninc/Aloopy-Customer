@@ -127,6 +127,7 @@ public class StampDetails extends ActionBarActivity {
         ((TextView)findViewById(R.id.lblStampCount)).setText(stampVolume.toString());
         ((TextView)findViewById(R.id.lblStampCount)).setTextColor(Integer.parseInt(textColor, 16) + 0xFF000000);
         ((TextView)findViewById(R.id.lblStamps)).setTextColor(Integer.parseInt(textColor, 16) + 0xFF000000);
+
         if(stampVolume <= 8) {
             stamp10.setVisibility(View.GONE);
             stamp09.setVisibility(View.GONE);
